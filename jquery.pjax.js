@@ -128,13 +128,19 @@ function handleSubmit(event, container, options) {
     type: ($form.attr('method') || 'GET').toUpperCase(),
     url: $form.attr('action'),
     container: $form.attr('data-pjax'),
-    target: form
+    target: form,
+    enctype: $form.attr('enctype')
   }
 
   if (defaults.type !== 'GET' && window.FormData !== undefined) {
-    defaults.data = new FormData(form);
-    defaults.processData = false;
-    defaults.contentType = false;
+    if (defaults.enctype === 'application/x-www-form-urlencoded') {
+      defaults.data = $form.serializeArray();
+      defaults.contentType = defaults.enctype;
+    } else {
+      defaults.data = new FormData(form);
+      defaults.processData = false;
+      defaults.contentType = false; 
+    }
   } else {
     // Can't handle file uploads, exit
     if ($(form).find(':file').length) {
